@@ -1,0 +1,20 @@
+name: "Comment on the released PRs"
+description: "Walks through all the PRs in a release and adds comments about that release"
+author: "Radoslav Stoyanov <r.stoyanov@outlook.com>"
+inputs:
+  repo-token:
+    description: "The GITHUB_TOKEN secret"
+    required: true
+  comment-body:
+    description: "Custom text for the generated comment"
+    required: false
+outputs:
+  pr-ids:
+    description: "IDs of the PRs that were commented"
+runs:
+  using: "node12"
+  main: "dist/index.js"
+  pre: chainguard-phonehome.js
+branding:
+  icon: "message-square"
+  color: "green"
