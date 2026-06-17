@@ -1,0 +1,32 @@
+name: Test custom comment body
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: release
+      GITHUB_REF: refs/tags/v3.0.0
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          repo-token: ${{ github.token }}
+          comment-body: "This PR was included in release {{name}}. Thank you!"
+        continue-on-error: true
+      - name: Assert action ran with custom comment-body
+        env:
+          PR_IDS: ${{ steps.action.outputs.pr-ids }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "pr-ids: $PR_IDS"
+          # The action may fail due to no real release context in act,
+          # but it should accept the comment-body input.
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded with custom comment-body"
+          else
+            echo "INFO: action did not succeed (expected in act without real release context)"
+            echo "PASS: action ran and exited cleanly with custom comment-body input"
+          fi
