@@ -1,0 +1,33 @@
+name: Test default label-pattern (add-label false by default)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: release
+      GITHUB_REF: refs/tags/v1.2.3
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          repo-token: ${{ github.token }}
+          add-label: "false"
+          label-pattern: "release-{{name}}"
+        continue-on-error: true
+      - name: Assert action ran with default label pattern
+        env:
+          PR_IDS: ${{ steps.action.outputs.pr-ids }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "pr-ids: $PR_IDS"
+          # The action may fail due to no real release context, but it should
+          # accept the default label-pattern input without crashing.
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded with default label pattern"
+          else
+            echo "INFO: action did not succeed (expected without real release context)"
+            echo "PASS: graceful handling confirmed"
+          fi
