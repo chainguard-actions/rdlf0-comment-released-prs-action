@@ -1,32 +1,32 @@
-name: Test custom comment body
+name: Test custom comment body input
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_EVENT_NAME: release
-      GITHUB_REF: refs/tags/v3.0.0
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
       - id: action
         uses: .
         with:
-          repo-token: ${{ github.token }}
-          comment-body: "This PR was included in release {{name}}. Thank you!"
-        continue-on-error: true
-      - name: Assert action ran with custom comment-body
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-body: "🚀 This PR was included in release {{name}}. Thank you for your contribution!"
+
+      - name: Assert action completed without failure
+        run: |
+          echo "Action step with custom comment-body completed successfully"
+          echo "PASS"
+
+      - name: Assert pr-ids output is empty (not a release event)
         env:
           PR_IDS: ${{ steps.action.outputs.pr-ids }}
-          OUTCOME: ${{ steps.action.outcome }}
         run: |
-          echo "outcome: $OUTCOME"
-          echo "pr-ids: $PR_IDS"
-          # The action may fail due to no real release context in act,
-          # but it should accept the comment-body input.
-          if [ "$OUTCOME" = "success" ]; then
-            echo "PASS: action succeeded with custom comment-body"
-          else
-            echo "INFO: action did not succeed (expected in act without real release context)"
-            echo "PASS: action ran and exited cleanly with custom comment-body input"
+          echo "pr-ids output: '$PR_IDS'"
+          # Under workflow_dispatch, the action returns early because it's not a
+          # release published event. The pr-ids output should be empty.
+          if [ -n "$PR_IDS" ]; then
+            echo "FAIL: expected empty pr-ids output for non-release event, got: $PR_IDS"
+            exit 1
           fi
+          echo "PASS: pr-ids is empty as expected for non-release event"

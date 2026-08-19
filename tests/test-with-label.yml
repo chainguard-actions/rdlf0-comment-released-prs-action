@@ -1,4 +1,4 @@
-name: Test basic usage - workflow_dispatch event
+name: Test with label adding enabled
 on:
   workflow_dispatch:
 jobs:
@@ -11,10 +11,12 @@ jobs:
         uses: .
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          add-label: "true"
+          label-pattern: "released-in-{{name}}"
 
       - name: Assert action completed without failure
         run: |
-          echo "Action step completed successfully (no failure exit code)"
+          echo "Action step with add-label=true and custom label-pattern completed successfully"
           echo "PASS"
 
       - name: Assert pr-ids output is empty (not a release event)
