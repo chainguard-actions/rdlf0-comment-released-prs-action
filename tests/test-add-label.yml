@@ -1,4 +1,4 @@
-name: Test custom comment-body input - non-release event graceful exit
+name: Test add-label input - non-release event graceful exit
 on:
   workflow_dispatch:
 
@@ -8,14 +8,13 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Run action with custom comment body
+      - name: Run action with add-label enabled
         id: action
         uses: .
         with:
           repo-token: ${{ github.token }}
-          comment-body: |
-            🎉 This PR is part of release {{name}} ({{tag_name}})!
-            Check out the release notes at {{html_url}}
+          add-label: "true"
+          label-pattern: "release-{{tag_name}}"
         # The action only processes 'release' events with action='published'.
         # Under workflow_dispatch, it logs an error and returns early without
         # failing the step.
@@ -25,7 +24,7 @@ jobs:
           echo "Action step completed successfully (graceful early exit for non-release event)"
           echo "PASS"
 
-      - name: Assert pr-ids output is empty when custom comment is set but event is not release
+      - name: Assert pr-ids output is empty when add-label is true but event is not release
         env:
           PR_IDS: ${{ steps.action.outputs.pr-ids }}
         run: |
