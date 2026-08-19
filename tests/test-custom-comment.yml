@@ -1,4 +1,4 @@
-name: Test basic usage
+name: Test custom comment body
 on:
   workflow_dispatch:
 jobs:
@@ -10,8 +10,9 @@ jobs:
         uses: .
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-body: "This PR was included in release v1.0.0 🎉"
         continue-on-error: true
-      - name: Assert action ran and pr-ids output exists
+      - name: Assert action ran with custom comment body
         env:
           PR_IDS: ${{ steps.action.outputs.pr-ids }}
           OUTCOME: ${{ steps.action.outcome }}
@@ -24,4 +25,4 @@ jobs:
             echo "FAIL: action was cancelled unexpectedly"
             exit 1
           fi
-          echo "PASS: action ran with outcome=$OUTCOME, pr-ids=$PR_IDS"
+          echo "PASS: action ran with custom comment body, outcome=$OUTCOME, pr-ids=$PR_IDS"
