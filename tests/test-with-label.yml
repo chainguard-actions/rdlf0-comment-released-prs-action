@@ -1,4 +1,4 @@
-name: Test basic usage
+name: Test with label and custom comment
 on:
   workflow_dispatch:
 jobs:
@@ -10,8 +10,11 @@ jobs:
         uses: .
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-body: "This PR was included in release {{name}}. Thank you!"
+          add-label: "true"
+          label-pattern: "shipped-in-{{name}}"
         continue-on-error: true
-      - name: Assert action completed
+      - name: Assert action completed with label options
         env:
           OUTCOME: ${{ steps.action.outcome }}
           PR_IDS: ${{ steps.action.outputs.pr-ids }}

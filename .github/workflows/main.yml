@@ -1,0 +1,28 @@
+name: Testing workflow
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    name: A testing job
+    steps:
+      # - name: Checkout
+      #   uses: actions/checkout@v2
+
+      - name: Comment on PRs
+        uses: rdlf0/comment-released-prs-action@249f57bed533baa7f883fe9d9a834424f153c3cb # v3
+        # uses: ./
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-body: "🎉 Hooray! 🎊 This is now part of [{{name}}]({{html_url}}) ✨"
+          add-label: true
+          label-pattern: "release-{{name}} 🐧"

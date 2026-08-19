@@ -1,4 +1,4 @@
-name: Test basic usage
+name: Test with add-label false (default)
 on:
   workflow_dispatch:
 jobs:
@@ -10,8 +10,9 @@ jobs:
         uses: .
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          add-label: "false"
         continue-on-error: true
-      - name: Assert action completed
+      - name: Assert action completed without adding labels
         env:
           OUTCOME: ${{ steps.action.outcome }}
           PR_IDS: ${{ steps.action.outputs.pr-ids }}
